@@ -20,7 +20,6 @@ exports.login = (req, res) => {
         result[0].password = crypto.createHash('md5').update(password).digest('hex');
         result[0].loginTime = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
         db.base(sql1, [moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')], (result) => {
-          console.log(result)
         })
         return res.json({
           status: 200,
