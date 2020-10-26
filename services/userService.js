@@ -9,7 +9,6 @@ exports.login = (req, res) => {
     var sql = `select * from blog_user where email = '${email}' and password = '${password}'`
     var sql1 = `update blog_user set loginTime = ? where email = '${email}' `
     db.base(sql, email, (result) => {
-        // console.log(result, '++++')
         if (!result.length) {
             return res.json({
                 status: -1,
@@ -71,6 +70,7 @@ exports.register = (req, res) => {
     })
 }
 
+
 exports.addArticle = (req, res) => {
     var { id, articleContent, articleTitle, cover, keyword } = req.body;
     var createTime = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
@@ -96,7 +96,6 @@ exports.addArticle = (req, res) => {
         })
     } else {
         db.base(sql1, [articleContent, articleTitle, cover, keyword, moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')], (result) => {
-            console.log(result)
             if (result.affectedRows == 1) {
                 return res.json({
                     status: 200,
@@ -123,7 +122,13 @@ exports.selectArticle = (req, res) => {
     });
     var sql = `SELECT * from blog_article WHERE deleted = 1 ORDER BY createTime desc limit ${page} , ${pageSize}`;
     db.base(sql, [currentPage, pageSize], (result) => {
-        if (!result.length) {
+        if (result.length < 1) {
+            return res.json({
+                status: 200,
+                message: '查询成功',
+                data: result,
+            })
+        } else if (!result.length) {
             return res.json({
                 status: -1,
                 message: '查询失败'
@@ -157,15 +162,81 @@ exports.selectOneArticle = (req, res) => {
         }
     })
 }
+
 exports.deleteOneArticle = (req, res) => {
     var { id } = req.body;
     var sql = `update blog_article set deleted = 0 where id = '${id}'`;
     db.base(sql, id, (result) => {
-        console.log(result)
         if (result.affectedRows == 1) {
             return res.json({
                 status: 200,
                 message: '删除文章成功'
+            })
+        } else {
+            return res.json({
+                status: -1,
+                message: '删除失败'
+            })
+        }
+    })
+}
+
+
+exports.addEssays = (req, res) => {
+    var { essaysContent } = req.body;
+    var createTime = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+    var remarks = '随笔备注';
+    var sql = `INSERT INTO blog_essays(essaysContent,createTime,remarks) VALUES (?,?,?)`;
+    db.base(sql, [essaysContent, createTime, remarks], (result) => {
+
+        if (result.affectedRows == 1) {
+            return res.json({
+                status: 200,
+                message: '添加随笔成功'
+            })
+        } else {
+            return res.json({
+                status: -1,
+                message: '添加失败'
+            })
+        }
+    })
+
+
+}
+
+exports.selectEssays = (req, res) => {
+    var sql = `SELECT * from blog_essays WHERE deleted = ? `;
+    db.base(sql, 1, (result) => {
+        if (result.length < 1) {
+            return res.json({
+                status: 200,
+                data: result,
+                message: '查询成功',
+            })
+        } else if (!result.length) {
+            return res.json({
+                status: -1,
+                message: '查询失败'
+            })
+        } else {
+            res.json({
+                status: 200,
+                message: '查询成功',
+                data: result
+            })
+        }
+    })
+}
+
+exports.deleteOneEssays = (req, res) => {
+    var { id } = req.body;
+    var sql = `update blog_essays set deleted = 0 where id = '${id}'`;
+    db.base(sql, id, (result) => {
+        if (result.affectedRows == 1) {
+            return res.json({
+                status: 200,
+                message: '删除随笔成功'
             })
         } else {
             return res.json({

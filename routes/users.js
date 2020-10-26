@@ -9,8 +9,17 @@ router.post('/api/register', services.register);
 router.post('/api/addArticle', services.addArticle);
 //查询文章
 router.post('/api/selectArticle', services.selectArticle);
-//查询单条
+//查询单条文章数据
 router.post('/api/selectOneArticle', services.selectOneArticle);
-//删除单条数据
+//删除单条文章数据
 router.post('/api/deleteOneArticle', services.deleteOneArticle);
+
+
+//添加随笔
+router.post('/api/addEssays', services.addEssays);
+
+router.post('/api/selectEssays', services.selectEssays);
+
+router.post('/api/deleteOneEssays', services.deleteOneEssays);
+
 module.exports = router
