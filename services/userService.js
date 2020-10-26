@@ -72,7 +72,11 @@ exports.register = (req, res) => {
 
 
 exports.addArticle = (req, res) => {
-    var { id, articleContent, articleTitle, cover, keyword } = req.body;
+    var id = req.body.id;
+    var articleContent = req.body.articleContent;
+    var articleTitle = req.body.articleTitle;
+    var cover = req.body.cover;
+    var keyword = req.body.keyword;
     var createTime = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     var author = 'admin';
     var classifiId = 1
@@ -113,7 +117,8 @@ exports.addArticle = (req, res) => {
 }
 
 exports.selectArticle = (req, res) => {
-    var { currentPage, pageSize } = req.body;
+    var pageSize = req.body.pageSize;
+    var currentPage = req.body.currentPage;
     var page = (currentPage - 1) * pageSize;
     var obj = {};
     var sql1 = `SELECT count(*) as counts from blog_article WHERE deleted = 1`;
@@ -145,7 +150,7 @@ exports.selectArticle = (req, res) => {
 }
 
 exports.selectOneArticle = (req, res) => {
-    var { id } = req.body;
+    var id = req.body.id;
     var sql = `SELECT * from blog_article WHERE deleted = 1  and id = ${id}`;
     db.base(sql, id, (result) => {
         if (!result.length) {
@@ -164,7 +169,7 @@ exports.selectOneArticle = (req, res) => {
 }
 
 exports.deleteOneArticle = (req, res) => {
-    var { id } = req.body;
+    var id = req.body.id;
     var sql = `update blog_article set deleted = 0 where id = '${id}'`;
     db.base(sql, id, (result) => {
         if (result.affectedRows == 1) {
@@ -183,7 +188,7 @@ exports.deleteOneArticle = (req, res) => {
 
 
 exports.addEssays = (req, res) => {
-    var { essaysContent } = req.body;
+    var essaysContent = req.body.essaysContent;
     var createTime = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     var remarks = '随笔备注';
     var sql = `INSERT INTO blog_essays(essaysContent,createTime,remarks) VALUES (?,?,?)`;
@@ -230,7 +235,7 @@ exports.selectEssays = (req, res) => {
 }
 
 exports.deleteOneEssays = (req, res) => {
-    var { id } = req.body;
+    var id = req.body.id;
     var sql = `update blog_essays set deleted = 0 where id = '${id}'`;
     db.base(sql, id, (result) => {
         if (result.affectedRows == 1) {
