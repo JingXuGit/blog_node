@@ -22,4 +22,6 @@ router.post('/api/selectEssays', services.selectEssays);
 
 router.post('/api/deleteOneEssays', services.deleteOneEssays);
 
+router.post('/api/uploadImage', services.uploadImage);
+
 module.exports = router

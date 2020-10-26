@@ -1,6 +1,6 @@
+const fs = require("fs");
 const db = require('../sql/db.js');
 var crypto = require('crypto');
-// var Date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
 var moment = require('moment');
 
 exports.login = (req, res) => {
@@ -250,4 +250,38 @@ exports.deleteOneEssays = (req, res) => {
             })
         }
     })
+}
+
+
+exports.uploadImage = (req, res) => {
+    let imgData = req.body.imgData;
+    var sql = `INSERT INTO blog_images(imageUrl,createTime) VALUES (?,?)`;
+    var sql1 = `INSERT INTO blog_images(imageUrl,createTime) VALUES (?,?)`;
+    if (imgData) {
+        //过滤data:URL
+        // let base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+        let dataBuffer = new Buffer.from(imgData, 'base64');
+        // 存储文件命名是使用当前时间，防止文件重名
+        let saveUrl = "./page/headImg/" + (new Date()).getTime() + ".png";
+        console.log(saveUrl)
+        fs.writeFile(saveUrl, dataBuffer, function(err) {
+            if (err) {
+                res.send(err);
+            } else {
+                db.base(sql, [saveUrl, moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')], (result) => {
+                    if (result.affectedRows == 1) {
+                        return res.json({
+                            status: 200,
+                            message: '上传图片成功'
+                        })
+                    } else {
+                        return res.json({
+                            status: -1,
+                            message: '上传失败'
+                        })
+                    }
+                })
+            }
+        });
+    }
 }
