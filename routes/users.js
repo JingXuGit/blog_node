@@ -24,4 +24,13 @@ router.post('/api/deleteOneEssays', services.deleteOneEssays);
 
 router.post('/api/uploadImage', services.uploadImage);
 
+
+
+router.post('/api/selectBlogNum', services.selectBlogNum);
+
+
+router.post('/api/selectBlogLabel', services.selectBlogLabel);
+
+
+
 module.exports = router

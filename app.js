@@ -45,4 +45,5 @@ app.listen('8101', function() {
 // });
 
 // //托管静态资源到public目录下
+app.use(express.static('./'));
 app.use(express.static('dist'));

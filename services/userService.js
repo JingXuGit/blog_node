@@ -3,6 +3,7 @@ const db = require('../sql/db.js');
 var crypto = require('crypto');
 var moment = require('moment');
 
+/* ---------------> 登录注册*/
 exports.login = (req, res) => {
     var email = req.body.email;
     var password = req.body.password;
@@ -71,6 +72,7 @@ exports.register = (req, res) => {
 }
 
 
+/*-----------------> 文章增删改查 */
 exports.addArticle = (req, res) => {
     var id = req.body.id;
     var articleContent = req.body.articleContent;
@@ -187,7 +189,10 @@ exports.deleteOneArticle = (req, res) => {
 }
 
 
+
+/* ---------------> 随笔增删查 */
 exports.addEssays = (req, res) => {
+
     var essaysContent = req.body.essaysContent;
     var createTime = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     var remarks = '随笔备注';
@@ -211,7 +216,11 @@ exports.addEssays = (req, res) => {
 }
 
 exports.selectEssays = (req, res) => {
-    var sql = `SELECT * from blog_essays WHERE deleted = ? `;
+    var pageSize = req.body.pageSize;
+    var currentPage = req.body.currentPage;
+    var page = (currentPage - 1) * pageSize;
+    var sql = `SELECT * from blog_essays WHERE deleted = 1 ORDER BY createTime desc limit ${page} , ${pageSize}`;
+    // var sql = `SELECT * from blog_essays WHERE deleted = ? `;
     db.base(sql, 1, (result) => {
         if (result.length < 1) {
             return res.json({
@@ -253,27 +262,34 @@ exports.deleteOneEssays = (req, res) => {
 }
 
 
+/* 上传图片返回path路径-----------> */
 exports.uploadImage = (req, res) => {
     let imgData = req.body.imgData;
     var sql = `INSERT INTO blog_images(imageUrl,createTime) VALUES (?,?)`;
-    var sql1 = `INSERT INTO blog_images(imageUrl,createTime) VALUES (?,?)`;
+    var sql1 = `SELECT * from blog_images WHERE deleted = 1  and imageUrl = ?`;
     if (imgData) {
         //过滤data:URL
         // let base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
         let dataBuffer = new Buffer.from(imgData, 'base64');
         // 存储文件命名是使用当前时间，防止文件重名
-        let saveUrl = "./page/headImg/" + (new Date()).getTime() + ".png";
-        console.log(saveUrl)
+        let saveUrl = "./public/page/headImg/" + (new Date()).getTime() + ".png";
         fs.writeFile(saveUrl, dataBuffer, function(err) {
             if (err) {
                 res.send(err);
             } else {
                 db.base(sql, [saveUrl, moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')], (result) => {
                     if (result.affectedRows == 1) {
-                        return res.json({
-                            status: 200,
-                            message: '上传图片成功'
+
+                        db.base(sql1, saveUrl, (result) => {
+                            if (result.length >= 1) {
+                                return res.json({
+                                    status: 200,
+                                    message: '上传图片成功',
+                                    data: result[0]
+                                })
+                            }
                         })
+
                     } else {
                         return res.json({
                             status: -1,
@@ -284,4 +300,40 @@ exports.uploadImage = (req, res) => {
             }
         });
     }
+}
+
+/* 查询博客信息 文章数,标签数,随笔数 */
+exports.selectBlogNum = (req, res) => {
+    var obj = {};
+    var sql1 = `SELECT count(1) as articleNum from blog_article WHERE deleted = 1`
+    var sql2 = `SELECT count(1) as essaysNum from blog_essays WHERE deleted = 1`
+    db.base(sql1, 1, (result) => {
+        obj.articleNum = result[0].articleNum
+        db.base(sql2, 1, (result) => {
+            obj.essaysNum = result[0].essaysNum
+            return res.json({
+                status: 200,
+                message: '成功',
+                data: obj
+            })
+        })
+    })
+
+}
+exports.selectBlogLabel = (req, res) => {
+    var sql = `SELECT keyword,count(1) as count  FROM blog_article where deleted = 1 GROUP BY keyword`
+    db.base(sql, 1, (result) => {
+        if (!result) {
+            res.json({
+                status: -1,
+                message: '失败',
+            })
+        } else {
+            res.json({
+                status: 200,
+                message: '成功',
+                data: result
+            })
+        }
+    })
 }
