@@ -31,6 +31,16 @@ router.post('/api/selectBlogNum', services.selectBlogNum);
 
 router.post('/api/selectBlogLabel', services.selectBlogLabel);
 
+router.post('/api/addcomment', services.addcomment);
+
+router.post('/api/selectcomment', services.selectcomment);
+
+router.post('/api/replycomment', services.replycomment);
+
+router.post('/api/selectReply', services.selectReply);
+
+router.post('/api/prase', services.prase);
+
 
 
 module.exports = router
