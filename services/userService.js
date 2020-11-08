@@ -123,11 +123,11 @@ exports.selectArticle = (req, res) => {
     var currentPage = req.body.currentPage;
     var page = (currentPage - 1) * pageSize;
     var obj = {};
-    var sql1 = `SELECT count(*) as counts from blog_article WHERE deleted = 1`;
+    var sql1 = `SELECT count(1) as counts from blog_article WHERE deleted = 1`;
     db.base(sql1, 1, (result) => {
         obj.total = result[0].counts
     });
-    var sql = `SELECT * from blog_article WHERE deleted = 1 ORDER BY createTime desc limit ${page} , ${pageSize}`;
+    var sql = `SELECT a.id, a.articleTitle, a.createTime,a.keyword,a.cover from blog_article a WHERE deleted = 1 ORDER BY createTime desc limit ${page} , ${pageSize}`;
     db.base(sql, [currentPage, pageSize], (result) => {
         if (result.length < 1) {
             return res.json({
@@ -322,7 +322,7 @@ exports.selectBlogNum = (req, res) => {
     }
     /* 查询博客信息标签数 */
 exports.selectBlogLabel = (req, res) => {
-    var sql = `SELECT keyword,count(1) as count  FROM blog_article where deleted = 1 GROUP BY keyword`
+    var sql = `SELECT keyword,id,count(1) as count  FROM blog_article a where deleted = 1 GROUP BY keyword,id`
     db.base(sql, 1, (result) => {
         if (!result) {
             res.json({
