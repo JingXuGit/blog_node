@@ -264,15 +264,15 @@ exports.deleteOneEssays = (req, res) => {
 
 /* 上传图片返回path路径-----------> */
 exports.uploadImage = (req, res) => {
-    let imgData = req.body.imgData;
+    var imgData = req.body.imgData;
     var sql = `INSERT INTO blog_images(imageUrl,createTime) VALUES (?,?)`;
     var sql1 = `SELECT * from blog_images WHERE deleted = 1  and imageUrl = ?`;
     if (imgData) {
         //过滤data:URL
-        // let base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
-        let dataBuffer = new Buffer.from(imgData, 'base64');
+        // var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+        var dataBuffer = new Buffer.from(imgData, 'base64');
         // 存储文件命名是使用当前时间，防止文件重名
-        let saveUrl = "./public/page/headImg/" + (new Date()).getTime() + ".png";
+        var saveUrl = "./public/page/headImg/" + (new Date()).getTime() + ".png";
         fs.writeFile(saveUrl, dataBuffer, function(err) {
             if (err) {
                 res.send(err);
